@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Col } from 'antd';
+import { Col, Button } from 'antd';
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -34,4 +34,7 @@ export const HeaderBtnCol = styled(Col)`
     display: flex;
     justify-content: flex-end;
     align-items: center;
+`;
+export const HeaderBtnRoom = styled(Button)`
+    margin-left: auto;
 `;

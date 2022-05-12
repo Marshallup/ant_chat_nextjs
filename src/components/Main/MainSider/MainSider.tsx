@@ -5,12 +5,21 @@ import {
     VideoCameraOutlined
 } from '@ant-design/icons';
 import AppContext from "@/contexts/AppContext";
+import useRoomList from "@/hooks/useRoomList";
 
 const { Sider } = Layout;
 
 const MainSider: FC = () => {
     const { siderCollapsed } = useContext(AppContext);
     const windowSize = useWindowSize();
+    const roomList = useRoomList();
+    const menuRoomList = useMemo(() => {
+        return roomList.map(roomID => ({
+            key: roomID,
+            label: roomID,
+
+        }))
+    }, [ roomList ]);
     const collapseWidth = useMemo(() => {
         const { width } = windowSize;
 
@@ -39,7 +48,7 @@ const MainSider: FC = () => {
                         key: '1',
                         icon: <VideoCameraOutlined />,
                         label: 'Доступные комнаты',
-                        children: []
+                        children: menuRoomList,
                     }
                 ]}
             >
