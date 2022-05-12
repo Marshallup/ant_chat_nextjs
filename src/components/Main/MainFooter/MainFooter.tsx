@@ -1,10 +1,11 @@
 import React, { FC } from "react";
+import { MainFooterEl } from "./styles";
 
 const MainFooter: FC = () => {
     return (
-        <footer>
+        <MainFooterEl>
             
-        </footer>
+        </MainFooterEl>
     )
 }
 

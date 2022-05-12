@@ -2449,11 +2449,6 @@ styled-jsx@5.0.2:
   resolved "https://registry.yarnpkg.com/styled-jsx/-/styled-jsx-5.0.2.tgz#ff230fd593b737e9e68b630a694d460425478729"
   integrity sha512-LqPQrbBh3egD57NBcHET4qcgshPks+yblyhPlH2GY8oaDgKs8SK4C3dBh3oSJjgzJ3G5t1SYEZGHkP+QEpX9EQ==
 
-styled-reset@^4.3.4:
-  version "4.3.4"
-  resolved "https://registry.yarnpkg.com/styled-reset/-/styled-reset-4.3.4.tgz#87b6f43caa3f83a5f9dc63773c13b8bb71efbe69"
-  integrity sha512-1UmkWmRwSPfzolKleyPjbZdBqkxSXv5ImqTP5WeSjWk0Z7IvEzsrYhrqinZfCg10eM1P6BEtFly8+puQJnN/0A==
-
 supports-color@^5.3.0, supports-color@^5.5.0:
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-5.5.0.tgz#e2e69a44ac8772f78a1ec0b35b689df6530efc8f"
@@ -2550,6 +2545,11 @@ uri-js@^4.2.2:
   integrity sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==
   dependencies:
     punycode "^2.1.0"
+
+usehooks-ts@^2.5.2:
+  version "2.5.2"
+  resolved "https://registry.yarnpkg.com/usehooks-ts/-/usehooks-ts-2.5.2.tgz#c6229a4dd59f7081e0b78569b23e7bb6f966e569"
+  integrity sha512-keONG+M5aax8eN9kEZeayNBgK+7MSLVGCuP18pSdce5D5iLiImCxqkm04GWYSkA7Xpo0GWnPOK3cXAOY/K+T1g==
 
 uuid@^8.3.2:
   version "8.3.2"

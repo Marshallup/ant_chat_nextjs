@@ -16,7 +16,7 @@
     "react-dom": "18.1.0",
     "socket.io-client": "^4.5.0",
     "styled-components": "^5.3.5",
-    "styled-reset": "^4.3.4",
+    "usehooks-ts": "^2.5.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

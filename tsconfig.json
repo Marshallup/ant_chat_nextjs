@@ -7,7 +7,9 @@
       "@/styles/*": [ "src/styles/*" ],
       "@/services/*": [ "src/services/*" ],
       "@/hooks/*": [ "src/hooks/*" ],
-      "@/utils/*": [ "src/utils/*" ]
+      "@/utils/*": [ "src/utils/*" ],
+      "@/contexts/*": [ "src/contexts/*" ],
+      "@/providers/*": [ "src/providers/*" ]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],

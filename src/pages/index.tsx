@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { ACTIONS } from "@/utils/ACTIONS_ROOMS";
 import { v4 } from 'uuid';
 import ChatSocket from "@/services/socket";
-import MainLayout from '@/layouts/MainLayout';
+import { Button } from 'antd';
 
 const Home: NextPage = () => {
     const [ rooms, setRooms ] = useState([]);
@@ -21,9 +21,11 @@ const Home: NextPage = () => {
     }, []);
 
     return (
-        <MainLayout>
+        <>
 
             <h1>Available rooms</h1>
+
+            <Button>qweqwe</Button>
 
             <ul ref={rootNode}>
 
@@ -51,7 +53,7 @@ const Home: NextPage = () => {
                 create new room
             </button>
 
-        </MainLayout>
+        </>
   )
 }
 

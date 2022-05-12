@@ -1,6 +1,5 @@
 import type { NextPage, GetServerSidePropsContext } from 'next';
 import useWebRTC, { LOCAL_VIDEO } from '@/hooks/useWebRTC';
-import MainLayout from '@/layouts/MainLayout';
 import { VideoRoomIDBody, VideoRoomElement, VideoRoomElementWrap } from '@/styles/pages/roomID';
 
 function layout(clientsNumber = 1): { width: string, height: string }[] {
@@ -42,30 +41,28 @@ const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
     const videoLayout = layout(clients.length);
     
     return (
-        <MainLayout>
-            <VideoRoomIDBody>
-                {
-                    clients.map((clientID, idx) => {
-                        return (
-                            <VideoRoomElementWrap
-                                key={clientID}
-                                id={clientID}
-                                style={videoLayout[idx]}
-                            >
-                                <VideoRoomElement
-                                    ref={instance => { provideMediaRef(clientID, instance); }}
-                                    width="100%"
-                                    height="100%"
-                                    autoPlay
-                                    playsInline
-                                    muted={clientID === LOCAL_VIDEO}
-                                />
-                            </VideoRoomElementWrap>
-                        )
-                    })
-                }
-            </VideoRoomIDBody>
-        </MainLayout>
+        <VideoRoomIDBody>
+            {
+                clients.map((clientID, idx) => {
+                    return (
+                        <VideoRoomElementWrap
+                            key={clientID}
+                            id={clientID}
+                            style={videoLayout[idx]}
+                        >
+                            <VideoRoomElement
+                                ref={instance => { provideMediaRef(clientID, instance); }}
+                                width="100%"
+                                height="100%"
+                                autoPlay
+                                playsInline
+                                muted={clientID === LOCAL_VIDEO}
+                            />
+                        </VideoRoomElementWrap>
+                    )
+                })
+            }
+        </VideoRoomIDBody>
     )
 }
 
