@@ -10,7 +10,10 @@ import {
     handleNewPeerInterface,
     setRemoteMediaInterface,
     handleRemovePeer,
+    ProvideMediaRefFn,
 } from './interfaces';
+
+// вернуть метод по ключу отключающий звук
 
 export default function useWebRTC(roomID: string) {
     const [clients, setClients] = useStateWithCallback<string[]>([]);
@@ -28,6 +31,22 @@ export default function useWebRTC(roomID: string) {
         }, cb);
         /* eslint-disable-next-line */
     }, [ clients, setClients ]);
+
+    function setEnabledMicrophone(status: boolean = false) {
+        const { current } = localMediaStream;
+
+        if (current) {
+            console.log(current.getAudioTracks());
+            current.getAudioTracks()[0].enabled = status;
+        }
+    }
+    function disableMicrophone() {
+        setEnabledMicrophone(false);
+    }
+
+    function enableMicrophone() {
+        setEnabledMicrophone(true);
+    }
 
     useEffect(() => {
         async function handleNewPeer({ peerID, createOffer }: handleNewPeerInterface) {
@@ -190,13 +209,15 @@ export default function useWebRTC(roomID: string) {
         /* eslint-disable-next-line */
     }, [ roomID ]);
 
-    const provideMediaRef = useCallback((id: string, node: HTMLVideoElement | null) => {
+    const provideMediaRef: ProvideMediaRefFn = useCallback((id, node) => {
         peerMediaElements.current[id] = node;
     }, []);
 
     return {
         clients,
-        provideMediaRef
+        provideMediaRef,
+        disableMicrophone,
+        enableMicrophone,
     };
 }
 

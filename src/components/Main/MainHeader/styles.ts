@@ -1,40 +1,22 @@
 import styled from "styled-components";
-import { Col, Button } from 'antd';
-import {
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-} from '@ant-design/icons';
-import { Layout } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
-const { Header } = Layout;
-
-const visibleSiderIconsStyles = `
-    cursor: pointer;
-    font-size: 1.8rem;
-    transition: color 0.3s;
-    &:hover {
-        color: #1890ff;
-    }
+export const MainHeaderEl = styled.header`
+    margin-bottom: 3.3rem;
 `;
-
-export const MainHeaderEl = styled(Header)`
-    background-color: #ffffff;
+export const BackBtnIcon = styled(ArrowLeftOutlined)`
+    margin: 0.2rem 0.9rem 0 0;
+    font-size: 1.5rem;
+    font-weight: 700;
 `;
-export const HideSiderIcon = styled(MenuFoldOutlined)`
-    ${visibleSiderIconsStyles}
-`;
-export const ShowSiderIcon = styled(MenuUnfoldOutlined)`
-    ${visibleSiderIconsStyles}
-`;
-export const HeaderMainPageLinkCol = styled(Col)`
-    text-align: center;
-    text-transform: uppercase;
-`;
-export const HeaderBtnCol = styled(Col)`
+export const BackBtn = styled.button`
+    padding: 0;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-`;
-export const HeaderBtnRoom = styled(Button)`
-    margin-left: auto;
+    color: #6667D9;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    font-size: 2rem;
+    cursor: pointer;
 `;

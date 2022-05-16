@@ -2,10 +2,7 @@ import React, { FC, PropsWithChildren } from "react";
 import Head from 'next/head';
 import { Layout } from 'antd';
 import AppProvider from '@/providers/AppProvider';
-import MainHeader from "@/components/Main/MainHeader";
-import MainFooter from "@/components/Main/MainFooter";
-import MainSider from "@/components/Main/MainSider";
-import { ContentMainLayout, RootLayout } from './styles';
+import { ContentMainLayout, RootLayout, MainLayoutContainer } from './styles';
 
 const MainLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
 
@@ -17,29 +14,27 @@ const MainLayout: FC<PropsWithChildren<{}>> = ({ children }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <RootLayout>
+            <MainLayoutContainer>
 
                 <AppProvider>
 
-                    <MainSider />
+                    <RootLayout>
 
-                    <Layout>
+                        <Layout>
 
-                        <MainHeader />
+                            <ContentMainLayout className="site-layout-background">
 
-                        <ContentMainLayout className="site-layout-background">
+                                { children }
 
-                            { children }
+                            </ContentMainLayout>
 
-                        </ContentMainLayout>
+                        </Layout>
 
-                        <MainFooter />
-
-                    </Layout>
+                    </RootLayout>
 
                 </AppProvider>
 
-            </RootLayout>
+            </MainLayoutContainer>
         </>
     )
 }

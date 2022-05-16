@@ -16,3 +16,4 @@ export interface setRemoteMediaInterface {
 export interface handleRemovePeer {
     peerID: string
 }
+export type ProvideMediaRefFn = (id: string, node: HTMLVideoElement | null) => void

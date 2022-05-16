@@ -3,8 +3,12 @@ import { Layout } from 'antd';
 
 const { Content } = Layout;
 
+export const MainLayoutContainer = styled.div`
+    max-width: 1800px;
+    margin: 0 auto;
+`;
 export const ContentMainLayout = styled(Content)`
-    margin: 2.4rem;
+    padding: 20px;
     background-color: #ffffff;
 `;
 export const RootLayout = styled(Layout)`

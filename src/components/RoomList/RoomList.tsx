@@ -1,42 +1,55 @@
-import React, { FC, useRef, useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { ACTIONS } from "@/utils/ACTIONS_ROOMS";
-import ChatSocket from "@/services/socket";
+import React, { FC, forwardRef } from "react";
+import Link from "next/link";
+import { RoomItemProps, RoomListProps } from "./interfaces";
+import { Button, Tooltip } from "antd";
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { RoomCard, RoomUl, RoomCardText, RoomCardContent } from "./styles";
 
 
-const RoomList: FC = () => {
-    const [ rooms, setRooms ] = useState([]);
-    const router = useRouter();
-    const rootNode = useRef<HTMLUListElement>(null);
-
-    useEffect(() => {
-        ChatSocket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] } = {}) => {
-            if (rootNode.current) {
-                setRooms(rooms);
-            }
-        })
-
-    }, []);
+export const RoomItem: FC<RoomItemProps> = ({ text, roomID }) => {
 
     return (
-        <ul ref={rootNode}>
+        <Tooltip
+            title={text}
+            placement={'bottom'}
+        >
 
-            { rooms.map(roomID => (
-                <li key={roomID}>
-                    { roomID }
+            <RoomCard>
+                <Link href={`/rooms/${roomID}`} passHref>
+                    <RoomCardContent>
+                        <RoomCardText>
+                            { text }
+                        </RoomCardText>
+                        <Button
+                            type={'primary'}
+                            shape={'circle'}
+                            icon={<ArrowRightOutlined/>}
+                        />
+                    </RoomCardContent>
+                </Link>
+            </RoomCard>
 
-                    <button
-                        onClick={() => {
-                            router.push(`/rooms/${roomID}`)
-                        }}
-                    >
-                        JOIN ROOM
-                    </button>
-                </li>
-            ))}
-
-            </ul>
+        </Tooltip>
     )
 }
+
+const RoomList = forwardRef<HTMLUListElement, RoomListProps>(({ rooms }, ref) => {
+
+    return (
+        <RoomUl ref={ref}>
+
+            { rooms.map(roomID => (
+                <RoomItem
+                    key={roomID}
+                    text={roomID}
+                    roomID={roomID}
+                />
+            ))}
+
+        </RoomUl>
+    )
+})
+
+RoomList.displayName = 'RoomList';
 
 export default RoomList;

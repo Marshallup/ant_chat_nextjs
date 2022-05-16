@@ -9,7 +9,9 @@
       "@/hooks/*": [ "src/hooks/*" ],
       "@/utils/*": [ "src/utils/*" ],
       "@/contexts/*": [ "src/contexts/*" ],
-      "@/providers/*": [ "src/providers/*" ]
+      "@/providers/*": [ "src/providers/*" ],
+      "@/assets/*": [ "src/assets/*" ],
+      "@/images/*": [ "src/assets/images/*" ]
     },
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
