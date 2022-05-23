@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import RoomList from '@/components/RoomList';
 import MainHeader from '@/components/Main/MainHeader';
 import Head from 'next/head';
-import chatSocket from '@/services/socket';
+import mySocket from '@/services/socket';
 import { ACTIONS } from '@/utils/ACTIONS_ROOMS';
 
 const Rooms: NextPage = () => {
@@ -11,12 +11,13 @@ const Rooms: NextPage = () => {
     const rootNode = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
-        chatSocket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] } = {}) => {
+        mySocket.on(ACTIONS.SHARE_ROOMS, ({ rooms } = {}) => {
             if (rootNode.current) {
                 setRooms(rooms);
             }
-        })
+        });
 
+        mySocket.emit(ACTIONS.GET_ROOMS);
     }, []);
 
     return (

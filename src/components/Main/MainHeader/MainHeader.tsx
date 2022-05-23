@@ -6,12 +6,16 @@ import CreateRoomBtn from "@/components/CreateRoomBtn";
 
 const MainHeader: FC = () => {
     const router = useRouter();
+
+    function goToMainPage() {
+        router.push('/');
+    }
     
     return (
         <MainHeaderEl>
             <Row gutter={2} justify={'space-between'}>
                 <Col>
-                    <BackBtn onClick={router.back}>
+                    <BackBtn onClick={goToMainPage}>
                         <BackBtnIcon />
                         Вернуться
                     </BackBtn>

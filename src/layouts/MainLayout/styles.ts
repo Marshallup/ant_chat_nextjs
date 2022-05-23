@@ -8,7 +8,7 @@ export const MainLayoutContainer = styled.div`
     margin: 0 auto;
 `;
 export const ContentMainLayout = styled(Content)`
-    padding: 20px;
+    padding: 2rem;
     background-color: #ffffff;
 `;
 export const RootLayout = styled(Layout)`

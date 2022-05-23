@@ -8,6 +8,8 @@ const options: ChatSocketOptions = {
     timeout: 10000,
     transports: [ 'websocket' ],
 }
-const chatSocket: Socket = io(`${WS_HOST}/chat`, options);
+const chatSocket: Socket = io(`${WS_HOST}/video-rooms`, options);
+
+chatSocket.connect();
 
 export default chatSocket;
