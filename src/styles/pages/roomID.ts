@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { Loader } from "../GeneralComponents";
 
 export const VideoRoomIDBody = styled.div`
     display: flex;
@@ -36,6 +37,36 @@ export const VideoRoomElWrap = styled.div`
             max-height: 50vh;
         }
     }
+`;
+export const VideoRoomElInner = styled.div`
+    position: relative;
+`;
+export const VideoOverlay = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+`;
+export const VideoLoaderWrap = styled.div`
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #332f2f;
+`;
+export const VideoItemName = styled.div`
+    color: white;
+    position: absolute;
+    padding: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+`;
+export const VideoLoaderInner = styled.div`
+    font-size: 5rem;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+`;
+export const VideoLoader = styled(Loader)`
 `;
 export const VideoRoomEl = styled.video`
     border-radius: inherit;

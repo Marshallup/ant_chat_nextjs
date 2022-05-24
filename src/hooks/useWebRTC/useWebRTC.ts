@@ -1,7 +1,7 @@
 import mySocket from "@/services/socket";
 import freeice from 'freeice';
 import { ACTIONS } from "@/utils/ACTIONS_ROOMS";
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 import useStateWithCallback from "../useStateWithCallback";
 import { LOCAL_VIDEO } from "./constants";
 import {
@@ -11,6 +11,7 @@ import {
     HandleNewPeerInterface,
     SetRemoteMediaInterface,
     HandleRemovePeerInterface,
+    PeerConnectionLoaders,
 } from "./interfaces";
 
 export default function useWebRTC(roomID: string) {
@@ -20,6 +21,9 @@ export default function useWebRTC(roomID: string) {
     })
     const videoEls = useRef<VideoElsInterface>({
         [LOCAL_VIDEO]: null,
+    });
+    const [videoLoaders, setVideoLoaders] = useState<PeerConnectionLoaders>({
+       [LOCAL_VIDEO]: true, 
     });
     const peerConnections = useRef<PeerConnectionsInterface>({});
     const addNewClient = useCallback((clientID: string, cb: () => void) => {
@@ -33,12 +37,33 @@ export default function useWebRTC(roomID: string) {
             return clientsID;
         }, cb);
     }, [ setClients ]);
+    const setLoadingStatus = useCallback((peerID: string, status: boolean) => {
+        setVideoLoaders(prevState => ({ ...prevState, [peerID]: status }));
+    }, [ setVideoLoaders ]);
+    const removeLoadingStatus = useCallback((peerID: string) => {
+        setVideoLoaders(prevState => {
+            delete prevState[peerID];
+            return { ...prevState };
+        });
+    }, [ setVideoLoaders ]);
     const getVideoElByID = useCallback((id: string) => videoEls.current[id], []);
     const getStreamByID = useCallback((id: string) => mediaStreams.current[id], []);
     const getPeerConnectionByID = useCallback((id: string) => peerConnections.current[id], []);
     const addPeerConnection = useCallback(( peerID: string ) => {
         peerConnections.current[peerID] = new RTCPeerConnection({ iceServers: freeice(), });
     }, []);
+        const addVideoInList = useCallback((peerID: string) => {
+        const stream = getStreamByID(peerID);
+
+        addNewClient(peerID, () => {
+            const videoEl = getVideoElByID(peerID);
+
+            if (videoEl) {
+                videoEl.srcObject = stream;
+            }
+        });
+
+    }, [ getStreamByID, addNewClient, getVideoElByID ]);
     const addOnTrackPeerConnectionByID = useCallback((peerID: string) => {
         const peerConnection = getPeerConnectionByID(peerID);
         
@@ -49,19 +74,13 @@ export default function useWebRTC(roomID: string) {
     
                     if (stream) {
                         stream.addTrack(track);
+                        addVideoInList(peerID);
+                        setLoadingStatus(peerID, false);
                     }
-
-                    addNewClient(peerID, () => {
-                        const videoEl = getVideoElByID(peerID);
-
-                        if (videoEl) {
-                            videoEl.srcObject = stream;
-                        }
-                    });
                 });
             }
         }
-    }, [ getStreamByID, getVideoElByID, getPeerConnectionByID, addNewClient ]);
+    }, [ getStreamByID, getPeerConnectionByID, addVideoInList, setLoadingStatus ]);
     const addEventIcePeerConnectionByID = useCallback((peerID: string) => {
         const peerConnection = getPeerConnectionByID(peerID);
 
@@ -129,8 +148,6 @@ export default function useWebRTC(roomID: string) {
 
     useEffect(() => {
         function handleRemovePeer({ peerID }: HandleRemovePeerInterface) {
-
-            console.log(peerID, 'remove')
             if (peerConnections.current[peerID]) {
                 peerConnections.current[peerID].close(); 
             }
@@ -139,6 +156,7 @@ export default function useWebRTC(roomID: string) {
             delete peerConnections.current[peerID];
             
             setClients(clients => clients.filter(clientID => clientID !== peerID));
+            removeLoadingStatus(peerID);
         }
 
         mySocket.on(ACTIONS.REMOVE_PEER, handleRemovePeer);
@@ -147,7 +165,7 @@ export default function useWebRTC(roomID: string) {
             mySocket.off(ACTIONS.REMOVE_PEER);
         }
 
-    }, [ setClients ]);
+    }, [ setClients, removeLoadingStatus ]);
 
 
     useEffect(() => {
@@ -158,6 +176,8 @@ export default function useWebRTC(roomID: string) {
                 console.warn(`${peerID} already connected!`);
                 return;
             }
+
+            setLoadingStatus(peerID, true);
 
             mediaStreams.current[peerID] = new MediaStream();
 
@@ -184,6 +204,7 @@ export default function useWebRTC(roomID: string) {
         getPeerConnectionByID,
         setLocalTrackInRemote,
         createOfferPeerConnection,
+        setLoadingStatus,
     ]);
 
     useEffect(() => {
@@ -245,6 +266,7 @@ export default function useWebRTC(roomID: string) {
                 if (localMediaEl) {
                     localMediaEl.srcObject = localMediaStream;
                     localMediaEl.volume = 0;
+                    setLoadingStatus(LOCAL_VIDEO, false);
                 }
             })
         }
@@ -265,12 +287,17 @@ export default function useWebRTC(roomID: string) {
             }
         }
         
-    }, [ roomID, addNewClient, getVideoElByID, getStreamByID ]);
+    }, [ roomID, addNewClient, getVideoElByID, getStreamByID, setLoadingStatus ]);
 
     return {
         clients,
+        videoLoaders,
         provideMediaEls,
         enableMicrophone,
         disableMicrophone,
     }
+}
+
+export {
+    LOCAL_VIDEO
 }

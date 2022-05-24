@@ -1,19 +1,20 @@
 import styled from "styled-components";
 
 export const VideoPanel = styled.div`
+    padding: 1rem;
     position: fixed;
     display: flex;
     justify-content: center;
-    bottom: 0.5rem;
+    bottom: 1rem;
     width: 100%;
     left: 50%;
     transform: translateX(-50%);
 `;
 
 export const ControlItem = styled.div<{ isRed?: boolean }>`
-    width: 5vw;
-    height: 5vw;
-    font-size: 2.3vw;
+    width: 4vw;
+    height: 4vw;
+    font-size: 2vw;
     max-width: 10rem;
     max-height: 10rem;
     min-width: 50px;
