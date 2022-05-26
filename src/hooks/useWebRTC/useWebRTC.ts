@@ -3,6 +3,7 @@ import freeice from 'freeice';
 import { ACTIONS } from "@/utils/ACTIONS_ROOMS";
 import { useRef, useEffect, useCallback, useState } from "react";
 import useStateWithCallback from "../useStateWithCallback";
+import useMediaDevice from "../useMediaDevice";
 import { LOCAL_VIDEO } from "./constants";
 import {
     VideoElsInterface,
@@ -15,6 +16,7 @@ import {
 } from "./interfaces";
 
 export default function useWebRTC(roomID: string) {
+    const { getDevicesByKind, getVideoAndAudio, } = useMediaDevice();
     const [ clients, setClients ] = useStateWithCallback<string[]>([]);
     const mediaStreams = useRef<MediaStreamsInterface>({
         [LOCAL_VIDEO]: null,
@@ -128,6 +130,20 @@ export default function useWebRTC(roomID: string) {
 
     }, [ getPeerConnectionByID ]);
 
+    function setEnabledVideo(status: boolean = false) {
+        const localStream = getStreamByID(LOCAL_VIDEO);
+
+        if (localStream) {
+            localStream.getVideoTracks()[0].enabled = status;
+        }
+    }
+    function disableVideo() {
+        setEnabledVideo();
+    }
+
+    function enableVideo() {
+        setEnabledVideo(true);
+    }
     function setEnabledMicrophone(status: boolean = false) {
         const localStream = getStreamByID(LOCAL_VIDEO);
 
@@ -136,7 +152,7 @@ export default function useWebRTC(roomID: string) {
         }
     }
     function disableMicrophone() {
-        setEnabledMicrophone(false);
+        setEnabledMicrophone();
     }
 
     function enableMicrophone() {
@@ -253,32 +269,84 @@ export default function useWebRTC(roomID: string) {
     }, [ getPeerConnectionByID ]);
 
     useEffect(() => {
+
+        // navigator.mediaDevices.ondevicechange = async () => {
+        //     const videoInput = await getDevicesByKind('videoinput');
+
+        //     if (videoInput.length) {
+        //         await navigator.mediaDevices.getUserMedia({
+        //             audio: true,
+        //             video: {
+        //                 deviceId: videoInput[0]?.deviceId,
+        //             },
+        //         })
+        //             .then(stream => {
+        //                 const localMediaEl = getVideoElByID(LOCAL_VIDEO);
+
+        //                 if (localMediaEl) {
+        //                     localMediaEl.srcObject = stream;
+        //                 }
+
+        //                 console.log(stream, localMediaEl, videoEls.current, 'ssss')
+        //             });
+        //     }
+        // }
+
+        function initReadyConnect() {
+            mySocket.emit(ACTIONS.CLIENT_READY_CONNECT, { roomID });
+        }
+        function joinRoom() {
+            mySocket.emit(ACTIONS.JOIN, { roomID });
+        }
         async function initMyVideo() {
-            mediaStreams.current[LOCAL_VIDEO] = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-                video: true,
-            });
+            const streamInfo = await getVideoAndAudio();
 
-            addNewClient(LOCAL_VIDEO, () => {
-                const localMediaEl = getVideoElByID(LOCAL_VIDEO);
-                const localMediaStream = mediaStreams.current[LOCAL_VIDEO];
+            if (streamInfo) {
+                mediaStreams.current[LOCAL_VIDEO] = streamInfo.stream;
 
-                if (localMediaEl) {
-                    localMediaEl.srcObject = localMediaStream;
-                    localMediaEl.volume = 0;
-                    setLoadingStatus(LOCAL_VIDEO, false);
-                }
-            })
+                addNewClient(LOCAL_VIDEO, () => {
+                    const localMediaEl = getVideoElByID(LOCAL_VIDEO);
+                    const localMediaStream = mediaStreams.current[LOCAL_VIDEO];
+    
+                    if (localMediaEl) {
+                        localMediaEl.srcObject = localMediaStream;
+                        localMediaEl.volume = 0;
+                        setLoadingStatus(LOCAL_VIDEO, false);
+                    }
+                });
+            }
+
+            switch(streamInfo.deviceNotAvailable) {
+                case 'audio':
+                    console.log('audio not available error');
+                    break;
+                case 'video':
+                    console.log('video not available error');
+                    break;
+                case 'both':
+                    console.log('both not available error');
+                    break;
+                default:
+                    break;
+
+            }
         }
 
-        initMyVideo()
-            .then(() => mySocket.emit(ACTIONS.JOIN, { roomID }))
-            .catch(error => {
-                console.log(error, 'error init my video');
-            });
+        mySocket.on(ACTIONS.SUCCESS_ROOM_CONNECTION, () => {
+            initMyVideo()
+                .then(() => initReadyConnect());
+        });
 
+        mySocket.on(ACTIONS.ERROR_ROOM_CONNECTION, () => {
+            console.log('error when connected');
+        });
+
+        joinRoom();
 
         return () => {
+            mySocket.off(ACTIONS.SUCCESS_ROOM_CONNECTION);
+            mySocket.off(ACTIONS.ERROR_ROOM_CONNECTION);
+
             const localStream = getStreamByID(LOCAL_VIDEO);
 
             if (localStream) {
@@ -286,8 +354,14 @@ export default function useWebRTC(roomID: string) {
                 mySocket.emit(ACTIONS.LEAVE);
             }
         }
-        
-    }, [ roomID, addNewClient, getVideoElByID, getStreamByID, setLoadingStatus ]);
+        /* eslint-disable-next-line */
+    }, [
+        roomID,
+        addNewClient,
+        getVideoElByID,
+        getStreamByID,
+        setLoadingStatus
+    ]);
 
     return {
         clients,
@@ -295,6 +369,8 @@ export default function useWebRTC(roomID: string) {
         provideMediaEls,
         enableMicrophone,
         disableMicrophone,
+        enableVideo,
+        disableVideo,
     }
 }
 

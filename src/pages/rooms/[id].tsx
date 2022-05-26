@@ -24,6 +24,8 @@ const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
         provideMediaEls,
         enableMicrophone,
         disableMicrophone,
+        enableVideo,
+        disableVideo,
     } = useWebRTC(roomID);
     const router = useRouter();
     const isLocalClient = useCallback((clientID: string) => {
@@ -81,6 +83,8 @@ const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
                     leaveRoom={leaveRoom}
                     enableMicro={enableMicrophone}
                     disableMicro={disableMicrophone}
+                    enableVideo={enableVideo}
+                    disableVideo={disableVideo}
                 />
             </VideoRoomBodyInner>
         </VideoRoomBody>
@@ -99,60 +103,3 @@ export const getServerSideProps = ( context: GetServerSidePropsContext ) => {
 }
 
 export default Room;
-
-
-
-
-
-
-
-
-
-// import type { NextPage, GetServerSidePropsContext } from 'next';
-// import useWebRTC from '@/hooks/useWebRTC';
-// import { useRouter } from 'next/router';
-// import { VideoRoomIDBody } from '@/styles/pages/roomID';
-// import VideoList from '@/components/VideoList';
-// import VideoControlPanel from '@/components/VideoControlPanel';
-
-// const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
-//     const router = useRouter();
-//     const {
-//         clients,
-//         provideMediaRef,
-//         disableMicrophone,
-//         enableMicrophone,
-//     } = useWebRTC(roomID);
-
-//     function leaveRoom() {
-//         router.push('/rooms');
-//     }
-    
-//     return (
-//         <>
-//             <VideoRoomIDBody>
-//                 <VideoList
-//                     clients={clients}
-//                     provideMediaRef={provideMediaRef}
-//                 />
-//             </VideoRoomIDBody>
-//             <VideoControlPanel
-//                 enableMicro={enableMicrophone}
-//                 disableMicro={disableMicrophone}
-//                 leaveRoom={leaveRoom}
-//             />
-//         </>
-//     )
-// }
-
-// export const getServerSideProps = ( context: GetServerSidePropsContext ) => {
-//     const { params } = context;
-
-//     return {
-//         props: {
-//             roomID: params?.id
-//         }
-//     };
-// }
-
-// export default Room;

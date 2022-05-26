@@ -23,7 +23,7 @@ export const VideoRoomBodyInner = styled.div`
     flex-wrap: wrap;
 `;
 export const VideoRoomElWrap = styled.div`
-    border-radius: 2rem;
+    min-width: 32rem;
 
     &.one-client {
         flex-basis: 100%;
@@ -35,11 +35,13 @@ export const VideoRoomElWrap = styled.div`
         flex-basis: 33%;
         video {
             max-height: 50vh;
+            min-height: 16rem;
         }
     }
 `;
 export const VideoRoomElInner = styled.div`
     position: relative;
+    border-radius: 2rem;
 `;
 export const VideoOverlay = styled.div`
     position: absolute;
@@ -58,6 +60,7 @@ export const VideoItemName = styled.div`
     padding: 1rem;
     bottom: 1rem;
     left: 1rem;
+    z-index: 1;
 `;
 export const VideoLoaderInner = styled.div`
     font-size: 5rem;
@@ -75,4 +78,5 @@ export const VideoRoomEl = styled.video`
     max-height: 100vh;
     object-fit: cover;
     padding: 1rem;
+    transform: scaleX(-1);
 `;

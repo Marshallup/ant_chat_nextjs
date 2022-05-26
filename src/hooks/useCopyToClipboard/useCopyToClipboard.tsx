@@ -1,0 +1,21 @@
+import copy from 'copy-to-clipboard';
+import { notification } from 'antd';
+import { notificationOptions } from './interfaces';
+
+function useCopyToClipboard() {
+    function initCopy(
+        value: string,
+        { message }: notificationOptions,
+    ) {
+        copy(value);
+
+        notification.open({
+            message: message || 'Пустой заголовок',
+            className: 'notification-success',
+        });
+    }
+
+    return initCopy;
+}
+
+export default useCopyToClipboard;
