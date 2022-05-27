@@ -1,11 +1,17 @@
+import { useCallback } from 'react';
 import { kindDevices, GetVideoAndAudioInterface } from './interfaces';
 
 function useMediaDevice() {
-    async function enumerateDevices() {
+    const enumerateDevices = useCallback(async () => {
         return navigator.mediaDevices.enumerateDevices()
             .then(devices => devices);
-    }
-    async function getVideo(videoInputID?: string) {
+    }, []);
+    const getDevicesByKind = useCallback(async (kind: kindDevices) => {
+        const devices = await enumerateDevices();
+
+        return devices.filter(device => device.kind === kind);
+    }, [ enumerateDevices ]);
+    const getVideo = useCallback(async (videoInputID?: string) => {
         let deviceId = videoInputID;
 
         if (!videoInputID) {
@@ -17,8 +23,8 @@ function useMediaDevice() {
                 deviceId,
             },
         });
-    }
-    async function getAudio(audioInputID?: string) {
+    }, [ getDevicesByKind ]);
+    const getAudio = useCallback(async (audioInputID?: string) => {
         let deviceId = audioInputID;
 
         if (!audioInputID) {
@@ -30,8 +36,8 @@ function useMediaDevice() {
                 deviceId,
             },
         });
-    }
-    async function getVideoAndAudio(audioInputID?: string, videoInputID?: string): Promise<GetVideoAndAudioInterface> {
+    }, [ getDevicesByKind ]);
+    const getVideoAndAudio = useCallback(async (audioInputID?: string, videoInputID?: string): Promise<GetVideoAndAudioInterface> => {
         let deviceVideoID = videoInputID;
         let deviceAudioID = audioInputID;
 
@@ -89,12 +95,7 @@ function useMediaDevice() {
         };
 
 
-    }
-    async function getDevicesByKind(kind: kindDevices) {
-        const devices = await enumerateDevices();
-
-        return devices.filter(device => device.kind === kind);
-    }
+    }, [ getDevicesByKind ])
 
     return {
         enumerateDevices,

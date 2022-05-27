@@ -8,7 +8,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 1.6rem;
   }
   .mu-icon {
-    font-size: 1em;
+    font-size: 1em !important;
   }
   .notification {
     &-success {

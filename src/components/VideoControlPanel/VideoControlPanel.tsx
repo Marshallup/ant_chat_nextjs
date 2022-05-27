@@ -1,37 +1,49 @@
-import React, { FC, useState } from "react";
-import { Row, Col } from "antd";
-import { VideoPanel, ControlItem } from "./styles";
+import React, { FC, useMemo, useState } from "react";
+import { Row, Col, Badge } from "antd";
+import { VideoPanel, ControlItem, ControlItemBadge } from "./styles";
 import { Videocam, VideocamOff, Mic, MicOff, Phone, Link } from '@mui/icons-material';
 import { VideoControlPanelProps } from "./interfaces";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
+import { Tooltip } from "antd";
 
 const VideoControlPanel: FC<VideoControlPanelProps> = ({
+    isAudioAvailable,
+    isVideoAvailable,
+    isVideoError,
+    isAudioError,
     enableMicro,
     disableMicro,
     enableVideo,
     disableVideo,
     leaveRoom,
 }) => {
-    const [ enabledMicro, setEnabledMicro ] = useState(true);
-    const [ enabledVideo, setEnabledVideo ] = useState(true);
     const copy = useCopyToClipboard();
 
+    const toolTipVideoText = useMemo(() => {
+        if (isVideoError) {
+            return 'Проверьте доступность камеры';
+        }
+
+        if (isVideoAvailable) {
+            return 'Выключить видео';
+        }
+
+        return 'Включить видео';
+    }, [ isVideoAvailable, isVideoError ]);
     function onClickCopyLink() {
         copy(document.location.href, { message: 'Ссылка успешно скопирована!' });
     }    
     function onClickToggleVideo() {
-        setEnabledVideo(!enabledVideo);
 
-        if (enabledVideo) {
+        if (isVideoAvailable) {
             disableVideo();
         } else {
             enableVideo();
         }
     }
     function onClickToggleMicro() {
-        setEnabledMicro(!enabledMicro);
 
-        if (enabledMicro) {
+        if (isAudioAvailable) {
             disableMicro();
         } else {
             enableMicro();
@@ -46,24 +58,34 @@ const VideoControlPanel: FC<VideoControlPanelProps> = ({
         <VideoPanel>
             <Row gutter={20}>
                 <Col>
-                    <ControlItem onClick={onClickToggleMicro}>
-                        { enabledMicro ? <Mic className="mu-icon" /> : <MicOff className="mu-icon" /> }
-                    </ControlItem>
+                    <Tooltip title={isAudioAvailable ? 'Выключить микрофон' : 'Включить микрофон'}>
+                        <ControlItem isRed={isAudioAvailable ? false : true} onClick={onClickToggleMicro}>
+                            { isAudioAvailable ? <Mic className="mu-icon" /> : <MicOff className="mu-icon" /> }
+                        </ControlItem>
+                    </Tooltip>
                 </Col>
                 <Col>
-                <ControlItem onClick={onClickToggleVideo}>
-                        { enabledVideo ? <Videocam className="mu-icon" /> : <VideocamOff className="mu-icon" /> }
-                    </ControlItem>
+                    <ControlItemBadge dot={isVideoError}>
+                        <Tooltip title={toolTipVideoText}>
+                            <ControlItem isRed={isVideoAvailable ? false : true} onClick={onClickToggleVideo}>
+                                { isVideoAvailable ? <Videocam className="mu-icon" /> : <VideocamOff className="mu-icon" /> }
+                            </ControlItem>
+                        </Tooltip>
+                    </ControlItemBadge>
                 </Col>
                 <Col>
-                    <ControlItem isRed onClick={onLeaveRoom}>
-                        <Phone className="mu-icon" />
-                    </ControlItem>
+                    <Tooltip title={'Покинуть комнату'}>
+                        <ControlItem isRed onClick={onLeaveRoom}>
+                            <Phone className="mu-icon" />
+                        </ControlItem>
+                    </Tooltip>
                 </Col>
                 <Col>
-                    <ControlItem onClick={onClickCopyLink}>
-                        <Link className="mu-icon" />
-                    </ControlItem>
+                    <Tooltip title={'Копировать ссылку на комнату'}>
+                        <ControlItem onClick={onClickCopyLink}>
+                            <Link className="mu-icon" />
+                        </ControlItem>
+                    </Tooltip>
                 </Col>
             </Row>
         </VideoPanel>

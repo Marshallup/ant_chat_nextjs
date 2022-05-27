@@ -7,18 +7,21 @@ import {
     VideoRoomEl,
     VideoRoomBodyInner,
     VideoRoomElInner,
-    VideoLoader,
     VideoOverlay,
     VideoLoaderInner,
     VideoLoaderWrap,
     VideoItemName,
+    PageLoaderWrap,
 } from '@/styles/pages/roomID';
+import { Loader } from "@/styles/GeneralComponents";
 import VideoControlPanel from "@/components/VideoControlPanel";
 import useWebRTC, { LOCAL_VIDEO } from "@/hooks/useWebRTC";
 
 
 const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
     const {
+        enabledDevices,
+        isWebRTCReady,
         clients,
         videoLoaders,
         provideMediaEls,
@@ -53,33 +56,40 @@ const Room: NextPage<{ roomID: string }> = ({ roomID }) => {
     return (
         <VideoRoomBody>
             <VideoRoomBodyInner>
+                <PageLoaderWrap className={ isWebRTCReady ? 'hide' : '' }>
+                    <Loader />
+                </PageLoaderWrap>   
                 { clients.map(clientID => (
-                    <VideoRoomElWrap
-                        className={classVideoList}
-                        key={clientID}
-                    >
-                        <VideoRoomElInner>
-                            <VideoOverlay>
-                                { videoLoaders[clientID] && (
-                                    <VideoLoaderWrap>
-                                        <VideoLoaderInner>
-                                            <VideoLoader />
-                                        </VideoLoaderInner>
-                                    </VideoLoaderWrap>
-                                )}
-                                { isLocalClient(clientID) && <VideoItemName>Вы</VideoItemName> }
-                            </VideoOverlay>
-                            <VideoRoomEl
-                                ref={instance => provideMediaEls(clientID, instance)}
-                                width={720}
-                                height={720}
-                                autoPlay
-                                playsInline
-                            />
-                        </VideoRoomElInner>
-                    </VideoRoomElWrap>
+                <VideoRoomElWrap
+                    className={classVideoList}
+                    key={clientID}
+                >
+                    <VideoRoomElInner>
+                        <VideoOverlay>
+                            { videoLoaders[clientID] && (
+                                <VideoLoaderWrap>
+                                    <VideoLoaderInner>
+                                        <Loader />
+                                    </VideoLoaderInner>
+                                </VideoLoaderWrap>
+                            )}
+                            { isLocalClient(clientID) && <VideoItemName>Вы</VideoItemName> }
+                        </VideoOverlay>
+                        <VideoRoomEl
+                            ref={instance => provideMediaEls(clientID, instance)}
+                            width={720}
+                            height={720}
+                            autoPlay
+                            playsInline
+                        />
+                    </VideoRoomElInner>
+                </VideoRoomElWrap>
                 ))}
                 <VideoControlPanel
+                    isAudioAvailable={enabledDevices.audio.enabled}
+                    isVideoAvailable={enabledDevices.video.enabled}
+                    isAudioError={enabledDevices.audio.error}
+                    isVideoError={enabledDevices.video.error}
                     leaveRoom={leaveRoom}
                     enableMicro={enableMicrophone}
                     disableMicro={disableMicrophone}

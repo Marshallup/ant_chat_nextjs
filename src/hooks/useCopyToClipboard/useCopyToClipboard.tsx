@@ -12,6 +12,8 @@ function useCopyToClipboard() {
         notification.open({
             message: message || 'Пустой заголовок',
             className: 'notification-success',
+            duration: 0.8,
+            maxCount: 2,
         });
     }
 

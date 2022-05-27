@@ -1,3 +1,4 @@
+import { Badge } from "antd";
 import styled from "styled-components";
 
 export const VideoPanel = styled.div`
@@ -9,6 +10,14 @@ export const VideoPanel = styled.div`
     width: 100%;
     left: 50%;
     transform: translateX(-50%);
+    z-index: 1;
+`;
+
+export const ControlItemBadge = styled(Badge)`
+    & .ant-badge-dot {
+        top: 0.6rem;
+        right: 1rem;
+    }
 `;
 
 export const ControlItem = styled.div<{ isRed?: boolean }>`

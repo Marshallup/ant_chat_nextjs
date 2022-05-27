@@ -7,7 +7,6 @@ import { RoomCard, RoomUl, RoomCardText, RoomCardContent } from "./styles";
 
 
 export const RoomItem: FC<RoomItemProps> = ({ text, roomID }) => {
-
     return (
         <Tooltip
             title={text}

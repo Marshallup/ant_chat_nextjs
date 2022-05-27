@@ -16,7 +16,18 @@ import {
 } from "./interfaces";
 
 export default function useWebRTC(roomID: string) {
-    const { getDevicesByKind, getVideoAndAudio, } = useMediaDevice();
+    const [ enabledDevices, setEnabledDevices ] = useState({
+        video: {
+            enabled: false,
+            error: false,
+        },
+        audio: {
+            enabled: false,
+            error: false,
+        },
+    });
+    const { getVideoAndAudio } = useMediaDevice();
+    const [ isWebRTCReady, setIsWebRTCReady ] = useState(false);
     const [ clients, setClients ] = useStateWithCallback<string[]>([]);
     const mediaStreams = useRef<MediaStreamsInterface>({
         [LOCAL_VIDEO]: null,
@@ -54,7 +65,7 @@ export default function useWebRTC(roomID: string) {
     const addPeerConnection = useCallback(( peerID: string ) => {
         peerConnections.current[peerID] = new RTCPeerConnection({ iceServers: freeice(), });
     }, []);
-        const addVideoInList = useCallback((peerID: string) => {
+    const addVideoInList = useCallback((peerID: string) => {
         const stream = getStreamByID(peerID);
 
         addNewClient(peerID, () => {
@@ -77,7 +88,9 @@ export default function useWebRTC(roomID: string) {
                     if (stream) {
                         stream.addTrack(track);
                         addVideoInList(peerID);
-                        setLoadingStatus(peerID, false);
+                        setTimeout(() => {
+                            setLoadingStatus(peerID, false);
+                        }, 100);
                     }
                 });
             }
@@ -130,25 +143,46 @@ export default function useWebRTC(roomID: string) {
 
     }, [ getPeerConnectionByID ]);
 
-    function setEnabledVideo(status: boolean = false) {
+    const setEnabledVideo = useCallback((status: boolean = false) => {
         const localStream = getStreamByID(LOCAL_VIDEO);
 
         if (localStream) {
-            localStream.getVideoTracks()[0].enabled = status;
-        }
-    }
-    function disableVideo() {
-        setEnabledVideo();
-    }
+            const tracks = localStream.getVideoTracks();
 
-    function enableVideo() {
+            if (tracks.length) {
+                setEnabledDevices(prevState => ({
+                    audio: prevState.audio,
+                    video: {
+                        enabled: status,
+                        error: prevState.video.error,
+                    },
+                }));
+                tracks[0].enabled = status;
+            }
+        }
+    }, [ getStreamByID ]);
+    const disableVideo = useCallback(() => {
+        setEnabledVideo();
+    }, [ setEnabledVideo ]);
+    const enableVideo = useCallback(() => {
         setEnabledVideo(true);
-    }
+    }, [ setEnabledVideo ]);
     function setEnabledMicrophone(status: boolean = false) {
         const localStream = getStreamByID(LOCAL_VIDEO);
 
         if (localStream) {
-            localStream.getAudioTracks()[0].enabled = status;
+            const tracks = localStream.getAudioTracks();
+
+            if (tracks.length) {
+                setEnabledDevices(prevState => ({
+                    audio: {
+                        enabled: status,
+                        error: prevState.audio.error,
+                    },
+                    video: prevState.video,
+                }));
+                tracks[0].enabled = status;
+            }
         }
     }
     function disableMicrophone() {
@@ -161,6 +195,72 @@ export default function useWebRTC(roomID: string) {
     function provideMediaEls(id: string, nodeEl: HTMLVideoElement | null) {
         videoEls.current[id] = nodeEl;
     }
+    const initMyVideo = useCallback(async () => {
+        const streamInfo = await getVideoAndAudio();
+
+        switch(streamInfo.deviceNotAvailable) {
+            case 'audio':
+                setEnabledDevices({
+                    audio: {
+                        enabled: false,
+                        error: true,
+                    },
+                    video: {
+                        enabled: true,
+                        error: false,
+                    },
+                });
+                console.log('audio not available error');
+                break;
+            case 'video':
+                setEnabledDevices({
+                    audio: {
+                        enabled: true,
+                        error: false,
+                    },
+                    video: {
+                        enabled: false,
+                        error: true,
+                    }
+                });
+                console.log('video not available error');
+                break;
+            case 'both':
+                setEnabledDevices({
+                    audio: {
+                        enabled: false,
+                        error: true,
+                    },
+                    video: {
+                        enabled: false,
+                        error: true,
+                    }
+                });
+                console.log('both not available error');
+                break;
+            default:
+                setEnabledDevices({
+                    audio: {
+                        enabled: true,
+                        error: false,
+                    },
+                    video: {
+                        enabled: true,
+                        error: false,
+                    }
+                });
+                setLoadingStatus(LOCAL_VIDEO, true);
+                break;
+
+        }
+
+        if (streamInfo) {
+            mediaStreams.current[LOCAL_VIDEO] = streamInfo.stream;
+        }
+
+        return streamInfo;
+
+    }, [ getVideoAndAudio, setEnabledDevices, setLoadingStatus ]);
 
     useEffect(() => {
         function handleRemovePeer({ peerID }: HandleRemovePeerInterface) {
@@ -186,6 +286,7 @@ export default function useWebRTC(roomID: string) {
 
     useEffect(() => {
         function handleNewPeer({ peerID, createOffer }: HandleNewPeerInterface) {
+            console.log(peerID, 'peerID');
             const peerConnection = getPeerConnectionByID(peerID);
 
             if (peerConnection) {
@@ -269,72 +370,68 @@ export default function useWebRTC(roomID: string) {
     }, [ getPeerConnectionByID ]);
 
     useEffect(() => {
+        navigator.mediaDevices.ondevicechange = async () => {
+            const { stream, deviceNotAvailable } = await initMyVideo();
 
-        // navigator.mediaDevices.ondevicechange = async () => {
-        //     const videoInput = await getDevicesByKind('videoinput');
+            if (!deviceNotAvailable) {
+                const localMediaEl = getVideoElByID(LOCAL_VIDEO);
+                disableVideo();
 
-        //     if (videoInput.length) {
-        //         await navigator.mediaDevices.getUserMedia({
-        //             audio: true,
-        //             video: {
-        //                 deviceId: videoInput[0]?.deviceId,
-        //             },
-        //         })
-        //             .then(stream => {
-        //                 const localMediaEl = getVideoElByID(LOCAL_VIDEO);
+                if (localMediaEl) {
+                    localMediaEl.srcObject = stream;
+                    localMediaEl.volume = 0;
 
-        //                 if (localMediaEl) {
-        //                     localMediaEl.srcObject = stream;
-        //                 }
+                    Object.entries(peerConnections.current).forEach(([ , peerConnection ]) => {
+                        const localStream = mediaStreams.current[LOCAL_VIDEO];
 
-        //                 console.log(stream, localMediaEl, videoEls.current, 'ssss')
-        //             });
-        //     }
-        // }
+                        if (localStream) {
+                            peerConnection.getSenders()
+                                .forEach((sender, idx) => {
+                                    sender.replaceTrack(localStream.getTracks()[idx]);
+                                })
+                            // peerConnection.getSenders()[1].replaceTrack(localStream.getTracks()[1]);
+                        }
+                    });
 
+
+                    setTimeout(() => {
+                        setLoadingStatus(LOCAL_VIDEO, false);
+                    }, 100);
+                }
+            }
+        }
+    }, [
+        initMyVideo,
+        getVideoElByID,
+        setLoadingStatus,
+        disableVideo,
+        setLocalTrackInRemote,
+    ]);
+
+    useEffect(() => {
         function initReadyConnect() {
             mySocket.emit(ACTIONS.CLIENT_READY_CONNECT, { roomID });
         }
         function joinRoom() {
             mySocket.emit(ACTIONS.JOIN, { roomID });
         }
-        async function initMyVideo() {
-            const streamInfo = await getVideoAndAudio();
-
-            if (streamInfo) {
-                mediaStreams.current[LOCAL_VIDEO] = streamInfo.stream;
-
-                addNewClient(LOCAL_VIDEO, () => {
-                    const localMediaEl = getVideoElByID(LOCAL_VIDEO);
-                    const localMediaStream = mediaStreams.current[LOCAL_VIDEO];
-    
-                    if (localMediaEl) {
-                        localMediaEl.srcObject = localMediaStream;
-                        localMediaEl.volume = 0;
-                        setLoadingStatus(LOCAL_VIDEO, false);
-                    }
-                });
-            }
-
-            switch(streamInfo.deviceNotAvailable) {
-                case 'audio':
-                    console.log('audio not available error');
-                    break;
-                case 'video':
-                    console.log('video not available error');
-                    break;
-                case 'both':
-                    console.log('both not available error');
-                    break;
-                default:
-                    break;
-
-            }
-        }
 
         mySocket.on(ACTIONS.SUCCESS_ROOM_CONNECTION, () => {
             initMyVideo()
-                .then(() => initReadyConnect());
+                .then(() => {
+                    addNewClient(LOCAL_VIDEO, () => {
+                        const localMediaEl = getVideoElByID(LOCAL_VIDEO);
+                        const localMediaStream = mediaStreams.current[LOCAL_VIDEO];
+        
+                        if (localMediaEl) {
+                            localMediaEl.srcObject = localMediaStream;
+                            localMediaEl.volume = 0;
+                            setLoadingStatus(LOCAL_VIDEO, false);
+                            setIsWebRTCReady(true);
+                        }
+                    });
+                    initReadyConnect();
+                });
         });
 
         mySocket.on(ACTIONS.ERROR_ROOM_CONNECTION, () => {
@@ -354,16 +451,19 @@ export default function useWebRTC(roomID: string) {
                 mySocket.emit(ACTIONS.LEAVE);
             }
         }
-        /* eslint-disable-next-line */
     }, [
         roomID,
         addNewClient,
         getVideoElByID,
         getStreamByID,
-        setLoadingStatus
+        setLoadingStatus,
+        getVideoAndAudio,
+        initMyVideo,
     ]);
 
     return {
+        enabledDevices,
+        isWebRTCReady,
         clients,
         videoLoaders,
         provideMediaEls,
