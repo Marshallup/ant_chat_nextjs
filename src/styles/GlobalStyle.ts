@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import { MEDIA_WIDTH } from './vars';
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -13,12 +14,22 @@ const GlobalStyle = createGlobalStyle`
   .notification {
     &-success {
       background-color: #73d13d;
-      .ant-notification-notice-message {
-        color: #ffffff;
-      }
-      .ant-notification-notice-close-icon > svg {
-        fill: #ffffff;
-      }
+    }
+    &-error {
+      background-color: #f5222d;
+    }
+  }
+
+  .ant-notification-notice-message {
+    color: #ffffff;
+  }
+  .ant-notification-notice-close-icon > svg {
+    fill: #ffffff;
+  }
+
+  @media screen and (max-width: ${MEDIA_WIDTH.MOBILE}) {
+    .mobile-hide {
+      display: none;
     }
   }
 `;

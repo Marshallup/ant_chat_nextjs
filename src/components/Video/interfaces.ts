@@ -1,4 +1,4 @@
-import { VideoHTMLAttributes, HTMLAttributes } from "react";
-
-export interface VideoWrapProps extends HTMLAttributes<HTMLDivElement> {}
-export interface VideoProps extends VideoHTMLAttributes<HTMLVideoElement> {}
+export interface VideoProps {
+    id: string,
+    cbOnMounted: (id: string) => void,
+}

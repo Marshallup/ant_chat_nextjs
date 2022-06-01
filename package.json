@@ -9,17 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.9.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/icons-material": "^5.8.0",
-    "@mui/material": "^5.8.1",
     "antd": "^4.20.4",
+    "copy-to-clipboard": "^3.3.1",
     "freeice": "^2.2.2",
     "next": "12.1.6",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "socket.io-client": "^4.5.0",
-    "copy-to-clipboard": "^3.3.1",
     "styled-components": "^5.3.5",
     "usehooks-ts": "^2.5.2",
     "uuid": "^8.3.2"

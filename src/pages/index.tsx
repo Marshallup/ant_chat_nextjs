@@ -1,5 +1,11 @@
 import type { NextPage } from 'next';
-import { MainTitle, MainImageContainer } from '@/styles/pages';
+import {
+    MainTitle,
+    MainImageContainer,
+    MainRow,
+    MainRowBtns,
+    MainBtnWrap,
+} from '@/styles/pages';
 import CreateRoomBtn from '@/components/CreateRoomBtn';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -9,25 +15,34 @@ import { Row, Col, Button } from 'antd';
 const Home: NextPage = () => {
 
     return (
-        <Row align={'middle'} gutter={20}>
+        <MainRow align={'middle'} gutter={20}>
             <Col span={12}>
+
                 <MainTitle>
                     Видео встречи - легко! Зайди в комнату или создай свою
                 </MainTitle>
-                <Row gutter={17}>
+
+                <MainRowBtns gutter={17}>
+
                     <Col>
-                        <CreateRoomBtn />
+                        <MainBtnWrap>
+                            <CreateRoomBtn />
+                        </MainBtnWrap>
                     </Col>
+
                     <Col>
-                        <Link href="/rooms">
-                            <a>
-                                <Button size={'large'}>
-                                    Посмотреть список комнат
-                                </Button>
-                            </a>
-                        </Link>
+                        <MainBtnWrap>
+                            <Link href="/rooms">
+                                <a>
+                                    <Button size={'large'}>
+                                        Посмотреть список комнат
+                                    </Button>
+                                </a>
+                            </Link>
+                        </MainBtnWrap>
                     </Col>
-                </Row>
+
+                </MainRowBtns>
             </Col>
 
             <Col span={12}>
@@ -42,7 +57,7 @@ const Home: NextPage = () => {
                     />
                 </MainImageContainer>
             </Col>
-        </Row>
+        </MainRow>
     )
 }
 

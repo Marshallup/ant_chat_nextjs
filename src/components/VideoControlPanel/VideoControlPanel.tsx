@@ -1,10 +1,14 @@
-import React, { FC, useMemo, useState } from "react";
-import { Row, Col, Badge } from "antd";
+import React, { FC, useMemo } from "react";
+import { Row, Col, Tooltip } from "antd";
 import { VideoPanel, ControlItem, ControlItemBadge } from "./styles";
-import { Videocam, VideocamOff, Mic, MicOff, Phone, Link } from '@mui/icons-material';
+import LinkIcon from "@/components/Icons/LinkIcon";
+import VideoOnIcon from "@/components/Icons/VideoOnIcon";
+import VideoOffIcon from "../Icons/VideoOffIcon";
+import MicroOnIcon from "../Icons/MicroOnIcon";
+import MicroOffIcon from "../Icons/MicroOffIcon";
+import PhoneIcon from "../Icons/PhoneIcon";
 import { VideoControlPanelProps } from "./interfaces";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
-import { Tooltip } from "antd";
 
 const VideoControlPanel: FC<VideoControlPanelProps> = ({
     isAudioAvailable,
@@ -30,6 +34,17 @@ const VideoControlPanel: FC<VideoControlPanelProps> = ({
 
         return 'Включить видео';
     }, [ isVideoAvailable, isVideoError ]);
+    const toolTipAudioText = useMemo(() => {
+        if (isAudioError) {
+            return 'Проверьте доступность микрофона';
+        }
+
+        if (isAudioAvailable) {
+            return 'Выключить микрофон';
+        }
+
+        return 'Включить микрофон';
+    }, [ isAudioAvailable, isAudioError ]);
     function onClickCopyLink() {
         copy(document.location.href, { message: 'Ссылка успешно скопирована!' });
     }    
@@ -37,7 +52,7 @@ const VideoControlPanel: FC<VideoControlPanelProps> = ({
 
         if (isVideoAvailable) {
             disableVideo();
-        } else {
+        } else if (!isVideoAvailable && !isVideoError) {
             enableVideo();
         }
     }
@@ -45,7 +60,7 @@ const VideoControlPanel: FC<VideoControlPanelProps> = ({
 
         if (isAudioAvailable) {
             disableMicro();
-        } else {
+        } else if (!isAudioAvailable && !isAudioError) {
             enableMicro();
         }
 
@@ -58,32 +73,32 @@ const VideoControlPanel: FC<VideoControlPanelProps> = ({
         <VideoPanel>
             <Row gutter={20}>
                 <Col>
-                    <Tooltip title={isAudioAvailable ? 'Выключить микрофон' : 'Включить микрофон'}>
+                    <Tooltip overlayClassName={'mobile-hide'} title={toolTipAudioText}>
                         <ControlItem isRed={isAudioAvailable ? false : true} onClick={onClickToggleMicro}>
-                            { isAudioAvailable ? <Mic className="mu-icon" /> : <MicOff className="mu-icon" /> }
+                            { isAudioAvailable ? <MicroOnIcon className="mu-icon" /> : <MicroOffIcon className="mu-icon" /> }
                         </ControlItem>
                     </Tooltip>
                 </Col>
                 <Col>
                     <ControlItemBadge dot={isVideoError}>
-                        <Tooltip title={toolTipVideoText}>
+                        <Tooltip overlayClassName={'mobile-hide'} title={toolTipVideoText}>
                             <ControlItem isRed={isVideoAvailable ? false : true} onClick={onClickToggleVideo}>
-                                { isVideoAvailable ? <Videocam className="mu-icon" /> : <VideocamOff className="mu-icon" /> }
+                                { isVideoAvailable ? <VideoOnIcon className="mu-icon" /> : <VideoOffIcon className="mu-icon" /> }
                             </ControlItem>
                         </Tooltip>
                     </ControlItemBadge>
                 </Col>
                 <Col>
-                    <Tooltip title={'Покинуть комнату'}>
+                    <Tooltip overlayClassName={'mobile-hide'} title={'Покинуть комнату'}>
                         <ControlItem isRed onClick={onLeaveRoom}>
-                            <Phone className="mu-icon" />
+                            <PhoneIcon className="mu-icon" />
                         </ControlItem>
                     </Tooltip>
                 </Col>
                 <Col>
-                    <Tooltip title={'Копировать ссылку на комнату'}>
+                    <Tooltip overlayClassName={'mobile-hide'} title={'Копировать ссылку на комнату'}>
                         <ControlItem onClick={onClickCopyLink}>
-                            <Link className="mu-icon" />
+                            <LinkIcon />
                         </ControlItem>
                     </Tooltip>
                 </Col>

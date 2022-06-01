@@ -1,32 +1,17 @@
-import React, { forwardRef, FC, PropsWithChildren } from "react";
-import { VideoProps, VideoWrapProps } from "./interfaces";
-import { VideoEl, VideoElWrap } from "./styles";
+import React, { useEffect, forwardRef, VideoHTMLAttributes } from "react";
+import { VideoProps } from "./interfaces";
 
-const Video = forwardRef<HTMLVideoElement, VideoProps>(({ ...props }, ref) => {
+const Video = forwardRef<HTMLVideoElement, VideoProps & VideoHTMLAttributes<HTMLVideoElement>>(({ id, cbOnMounted, ...props }, ref) => {
+
+    useEffect(() => {
+        cbOnMounted(id);
+    }, [ id, cbOnMounted ]);
+
     return (
-        <VideoEl
-            ref={ref}
-            { ...props }
-        />
+        <video ref={ref} { ...props } />
     )
 });
 
-export const VideoWrap: FC<PropsWithChildren<VideoWrapProps>> = ({ children, ...props }) => {
-    return (
-        <VideoElWrap { ...props } >
-            { children }
-        </VideoElWrap>
-    )
-}
-
-const VideoList: FC<PropsWithChildren<{}>> = ({ children }) => {
-    return (
-        <ul>
-            { children }
-        </ul>
-    )
-} 
-
-Video.displayName = 'Video';
+Video.displayName = 'MyVideo';
 
 export default Video;

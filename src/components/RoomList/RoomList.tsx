@@ -11,6 +11,7 @@ export const RoomItem: FC<RoomItemProps> = ({ text, roomID }) => {
         <Tooltip
             title={text}
             placement={'bottom'}
+            overlayClassName={'mobile-hide'}
         >
 
             <RoomCard>
